@@ -1,19 +1,27 @@
 version: '3'
 
+output: prefixed
+
 tasks:
     default:
+        silent: true
         desc: Show available tasks
+        prefix: '💡'
         cmds:
         - task --list
 
     setup:
+        silent: true
         desc: Setup development environment
         deps:
         - setup:tools
         - setup:hooks
 
     setup:tools:
+        internal: true
+        silent: true
         desc: Install development tools via proto
+        prefix: '🔧'
         sources:
         - .prototools
         cmds:
@@ -25,7 +33,10 @@ tasks:
         - ~/.proto/bin/task
 
     setup:hooks:
+        internal: true
+        silent: true
         desc: Install git hooks
+        prefix: '🪝'
         sources:
         - lefthook.yml
         cmds:
@@ -37,28 +48,39 @@ tasks:
         - .git/hooks/pre-commit
         - .git/hooks/commit-msg
 
-    chezmoi:apply:
+    apply:
+        silent: true
         desc: Apply chezmoi configuration
+        prefix: '👣'
+        prompt: 'Are you sure you want to apply chezmoi configuration?'
         cmds:
         - chezmoi apply
 
-    chezmoi:diff:
+    diff:
+        silent: true
         desc: Show chezmoi diff
+        prefix: '🎨'
         cmds:
         - chezmoi diff
 
-    chezmoi:status:
+    status:
+        silent: true
         desc: Show chezmoi status
+        prefix: '🎨'
         cmds:
         - chezmoi status
 
-    chezmoi:update:
+    update:
+        silent: true
         desc: Update chezmoi from source
+        prefix: '👷'
         cmds:
         - chezmoi update
 
     lint:
+        silent: true
         desc: Check code formatting with dprint
+        prefix: '🔍'
         sources:
         - '**/*.{json,toml,yaml,yml,md}'
         - dprint.json
@@ -66,7 +88,9 @@ tasks:
         - dprint check
 
     format:
+        silent: true
         desc: Format code with dprint
+        prefix: '📝'
         sources:
         - '**/*.{json,toml,yaml,yml,md}'
         - dprint.json
@@ -74,8 +98,10 @@ tasks:
         - dprint fmt
 
     git:commit:
-        desc: Generate a commit message with Copilot and commit
         silent: true
+        desc: Generate a commit message with Copilot and commit
+        prefix: '📚'
+        prompt: 'Are you sure you want to commit with GitHub Copilot?'
         cmds:
         - git add .
         - |
@@ -105,13 +131,16 @@ tasks:
               fi
 
     git:log:
+        silent: true
         desc: Show git log
+        prefix: '📊'
         cmds:
         - git log --graph --oneline --all --decorate --date=short --abbrev-commit --pretty=format:'%Cblue%ad %C(auto)%h%Creset -%C(auto)%d%Creset %s %Cblue[%aN]%Creset %Cblue%G?%Creset'
 
     git:rm:his:
         silent: true
         desc: ⚠️ (DESTRUCTIVE) Remove a file from all history with pre/post verification.
+        prefix: '🔥'
         summary: |
             This is a destructive operation that rewrites the entire repository history.
             It requires 'git-filter-repo' to be installed (`pip install git-filter-repo`).
@@ -128,8 +157,9 @@ tasks:
           msg: "git-filter-repo is not installed. Please run 'pip install git-filter-repo'."
         - sh: test -n "{{.FILE_PATH}}"
           msg: 'You must provide the path to the file you want to remove. Usage: task git:rm:his -- path/to/file'
-        # - sh: '[ $(git rev-list --all --count -- "{{.FILE_PATH}}") -gt 0 ]'
-        #   msg: "✅ SKIPPED: File '{{.FILE_PATH}}' was not found in the entire Git history. Nothing to do."
+        - sh: '[ $(git rev-list --all --count -- "{{.FILE_PATH}}") -gt 0 ]'
+          msg: "✅ SKIPPED: File '{{.FILE_PATH}}' was not found in the entire Git history. Nothing to do."
+        prompt: 'Are you sure you want to remove {{.FILE_PATH}} from all of history?'
         cmds:
         - |
               echo "🔥 Starting the process to remove '{{.FILE_PATH}}' from all of history..."
@@ -164,14 +194,10 @@ tasks:
               echo "3. Close the 'Secret scanning alert' on GitHub."
 
     clean:
+        silent: true
         desc: Clean up temporary files
+        prefix: '🧹'
+        prompt: 'Are you sure you want to clean up temporary files?'
         cmds:
         - rm -rf .task/
         - git clean -fd
-
-    update:
-        desc: Update all tools and dependencies
-        cmds:
-        - proto outdated
-        - proto upgrade
-        - chezmoi upgrade
