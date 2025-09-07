@@ -1,9 +1,9 @@
 {
-  "cSpell.words": [
-    "chezmoi",
-    "espanso"
-  ],
-  "files.associations": {
-    "plyconfig.json": "jsonc"
-  }
+    "cSpell.words": [
+        "chezmoi",
+        "espanso"
+    ],
+    "files.associations": {
+        "plyconfig.json": "jsonc"
+    }
 }

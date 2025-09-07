@@ -1,128 +1,128 @@
-version: "3"
+version: '3'
 
 tasks:
-  default:
-    desc: Show available tasks
-    cmds:
-      - task --list
+    default:
+        desc: Show available tasks
+        cmds:
+        - task --list
 
-  setup:
-    desc: Setup development environment
-    deps:
-      - setup:tools
-      - setup:hooks
+    setup:
+        desc: Setup development environment
+        deps:
+        - setup:tools
+        - setup:hooks
 
-  setup:tools:
-    desc: Install development tools via proto
-    sources:
-      - .prototools
-    cmds:
-      - proto install
-    generates:
-      - ~/.proto/bin/commitlint
-      - ~/.proto/bin/lefthook
-      - ~/.proto/bin/dprint
-      - ~/.proto/bin/task
+    setup:tools:
+        desc: Install development tools via proto
+        sources:
+        - .prototools
+        cmds:
+        - proto install
+        generates:
+        - ~/.proto/bin/commitlint
+        - ~/.proto/bin/lefthook
+        - ~/.proto/bin/dprint
+        - ~/.proto/bin/task
 
-  setup:hooks:
-    desc: Install git hooks
-    sources:
-      - lefthook.yml
-    cmds:
-      - lefthook install
-    status:
-      - test -f .git/hooks/pre-commit
-      - test -f .git/hooks/commit-msg
-    generates:
-      - .git/hooks/pre-commit
-      - .git/hooks/commit-msg
+    setup:hooks:
+        desc: Install git hooks
+        sources:
+        - lefthook.yml
+        cmds:
+        - lefthook install
+        status:
+        - test -f .git/hooks/pre-commit
+        - test -f .git/hooks/commit-msg
+        generates:
+        - .git/hooks/pre-commit
+        - .git/hooks/commit-msg
 
-  chezmoi:apply:
-    desc: Apply chezmoi configuration
-    cmds:
-      - chezmoi apply
+    chezmoi:apply:
+        desc: Apply chezmoi configuration
+        cmds:
+        - chezmoi apply
 
-  chezmoi:diff:
-    desc: Show chezmoi diff
-    cmds:
-      - chezmoi diff
+    chezmoi:diff:
+        desc: Show chezmoi diff
+        cmds:
+        - chezmoi diff
 
-  chezmoi:status:
-    desc: Show chezmoi status
-    cmds:
-      - chezmoi status
+    chezmoi:status:
+        desc: Show chezmoi status
+        cmds:
+        - chezmoi status
 
-  chezmoi:update:
-    desc: Update chezmoi from source
-    cmds:
-      - chezmoi update
+    chezmoi:update:
+        desc: Update chezmoi from source
+        cmds:
+        - chezmoi update
 
-  lint:
-    desc: Check code formatting with dprint
-    sources:
-      - "**/*.{json,toml,yaml,yml,md}"
-      - dprint.json
-    cmds:
-      - dprint check
+    lint:
+        desc: Check code formatting with dprint
+        sources:
+        - '**/*.{json,toml,yaml,yml,md}'
+        - dprint.json
+        cmds:
+        - dprint check
 
-  format:
-    desc: Format code with dprint
-    sources:
-      - "**/*.{json,toml,yaml,yml,md}"
-      - dprint.json
-    cmds:
-      - dprint fmt
+    format:
+        desc: Format code with dprint
+        sources:
+        - '**/*.{json,toml,yaml,yml,md}'
+        - dprint.json
+        cmds:
+        - dprint fmt
 
-  git:commit:
-    desc: Generate a commit message with Copilot and commit
-    silent: true
-    cmds:
-      - git add .
-      - |
-          if ! git diff --staged --quiet; then
-            echo "📝 Generating a commit message with GitHub Copilot..."
+    git:commit:
+        desc: Generate a commit message with Copilot and commit
+        silent: true
+        cmds:
+        - git add .
+        - |
+              if ! git diff --staged --quiet; then
+                echo "📝 Generating a commit message with GitHub Copilot..."
 
-            DIFF=$(git diff --staged)
-            echo "🔍 Changes:"
+                DIFF=$(git diff --staged)
+                echo "🔍 Changes:"
 
-            PROMPT="""
-            Generate a git commit message for my changes. Follow the Conventional Commits specification strictly. The entire message must be a single line in the format: '<type>(<scope>): <subject>'.
-            The changes are: $DIFF
-            - The type must be one of: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert.
-            - The scope is optional.
-            - The subject must be in the imperative mood, start with a lowercase letter, and have no period at the end.
-            - Provide only the single-line commit message itself, without any introduction or explanation.
-            """
+                PROMPT="""
+                Generate a git commit message for my changes. Follow the Conventional Commits specification strictly. The entire message must be a single line in the format: '<type>(<scope>): <subject>'.
+                The changes are: $DIFF
+                - The type must be one of: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert.
+                - The scope is optional.
+                - The subject must be in the imperative mood, start with a lowercase letter, and have no period at the end.
+                - Provide only the single-line commit message itself, without any introduction or explanation.
+                """
 
-            COMMIT_MSG=$(gh copilot suggest "$PROMPT")
+                COMMIT_MSG=$(gh copilot suggest "$PROMPT")
 
-            echo "💬 Generated Message:"
-            echo "   $COMMIT_MSG"
-            git commit -m "$COMMIT_MSG"
-            echo "✅ Committed successfully!"
-          else
-            echo "🤷 No changes staged for commit."
-          fi
+                echo "💬 Generated Message:"
+                echo "   $COMMIT_MSG"
+                git commit -m "$COMMIT_MSG"
+                echo "✅ Committed successfully!"
+              else
+                echo "🤷 No changes staged for commit."
+              fi
 
-  git:log:
-    desc: Show git log
-    cmds:
-      - git log --graph --oneline --all --decorate --date=short --abbrev-commit --pretty=format:'%Cblue%ad %C(auto)%h%Creset -%C(auto)%d%Creset %s %Cblue[%aN]%Creset %Cblue%G?%Creset'
+    git:log:
+        desc: Show git log
+        cmds:
+        - git log --graph --oneline --all --decorate --date=short --abbrev-commit --pretty=format:'%Cblue%ad %C(auto)%h%Creset -%C(auto)%d%Creset %s %Cblue[%aN]%Creset %Cblue%G?%Creset'
 
-  git:rm:his:
-    desc: Remove history of a commit
-    cmds:
-      - git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch {{.CLI_ARG}}' -- --all
+    git:rm:his:
+        desc: Remove history of a commit
+        cmds:
+        - git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch {{.CLI_ARGS}}' -- --all
 
-  clean:
-    desc: Clean up temporary files
-    cmds:
-      - rm -rf .task/
-      - git clean -fd
+    clean:
+        desc: Clean up temporary files
+        cmds:
+        - rm -rf .task/
+        - git clean -fd
 
-  update:
-    desc: Update all tools and dependencies
-    cmds:
-      - proto outdated
-      - proto upgrade
-      - chezmoi upgrade
+    update:
+        desc: Update all tools and dependencies
+        cmds:
+        - proto outdated
+        - proto upgrade
+        - chezmoi upgrade

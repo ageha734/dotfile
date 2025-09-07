@@ -5,8 +5,8 @@ prompt: enabled
 prefer_editor_prompt: disabled
 pager:
 aliases:
-  web: repo view --web
-  co: pr checkout
+    web: repo view --web
+    co: pr checkout
 http_unix_socket:
 browser:
 color_labels: disabled

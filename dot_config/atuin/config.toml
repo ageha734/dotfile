@@ -201,8 +201,8 @@ enter_accept = true
 
 ## Set commands that will be completely ignored from stats
 ignored_commands = [
-  "cd",
-  "ls",
+    "cd",
+    "ls",
 ]
 
 [keys]
