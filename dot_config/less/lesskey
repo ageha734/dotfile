@@ -1,11 +1,7 @@
-# command
-# line-edit
-# env
 LESSHISTFILE = ~/.config/less/lesshist
 LESSOPEN     = | /opt/homebrew/bin/src-hilite-lesspipe.sh %s
 LESS = -i -q -x2 -N -R
 
-# line-edit
 ^B    left
 ^F    right
 ^D    delete
@@ -15,5 +11,3 @@ LESS = -i -q -x2 -N -R
 ^P    up
 ^N    down
 ^K    kill-line
-
-

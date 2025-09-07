@@ -152,28 +152,12 @@ if.app-id = 'ai.krisp.krispMac'
 run = 'layout floating'
 
 [[on-window-detected]]
-if.app-id = 'com.slidepad.slidepad'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apptorium.SideNotes-paddle'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.surteesstudios.Bartender'
-run = 'layout floating'
-
-[[on-window-detected]]
 if.app-id = 'leits.MeetingBar'
 run = 'layout floating'
 
 [[on-window-detected]]
 if.app-id = 'com.1password.1password'
 run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'macos-wakatime.WakaTime'
-run = 'move-node-to-workspace 0'
 
 [[on-window-detected]]
 if.app-id = 'com.microsoft.CompanyPortalMac'
@@ -188,28 +172,12 @@ if.app-id = 'com.jamfsoftware.selfservice.mac'
 run = 'move-node-to-workspace 0'
 
 [[on-window-detected]]
-if.app-id = 'app.humansongs.spillitout'
-run = 'move-node-to-workspace 0'
-
-[[on-window-detected]]
 if.app-id = 'com.cisco.secureclient.gui'
 run = 'move-node-to-workspace 0'
 
 [[on-window-detected]]
 if.app-id = 'company.thebrowser.Browser'
 run = 'move-node-to-workspace 1'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.dt.Xcode'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
-if.app-id = 'com.nonstrict.Bezel-direct'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
-if.app-id = 'com.google.android.studio'
-run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.jetbrains.goland'
@@ -228,31 +196,11 @@ if.app-id = 'com.electron.open-lens'
 run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
-if.app-id = 'org.jkiss.dbeaver.core.product'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
-if.app-id = 'com.jgraph.drawio.desktop'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
 if.app-id = 'com.postmanlabs.mac'
 run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
-if.app-id = 'org.wireshark.Wireshark'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
-if.app-id = 'org.wireshark.Stratoshark'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
 if.app-id = 'com.todesktop.230313mzl4w4u92'
-run = 'move-node-to-workspace 2'
-
-[[on-window-detected]]
-if.app-id = 'minimal.Pinto'
 run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
@@ -261,10 +209,6 @@ run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace 3'
-
-[[on-window-detected]]
-if.app-id = 'com.gather.Gather'
 run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
