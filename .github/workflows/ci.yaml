@@ -53,11 +53,6 @@ jobs:
         permissions:
             contents: write
 
-        strategy:
-            matrix:
-                file:
-                - 'nx.js'
-
         steps:
         - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
           with:
@@ -88,18 +83,32 @@ jobs:
               head: HEAD
               extra_args: --debug --only-verified
 
-        - name: Check for ${{ matrix.file }} files (Security Risk)
+        - name: Check for specific files (Security Risk)
           shell: bash
           run: |
-              echo "🔍 Scanning for ${{ matrix.file }} files..."
-              files=$(find ~/ -type f -name '${{ matrix.file }}' 2>/dev/null || true)
-              if [ -n "$files" ]; then
-                echo "❌ SECURITY ALERT: ${{ matrix.file }} files detected!"
-                echo "$files"
-                echo "::error::${{ matrix.file }} files found in repository. This may pose a security risk."
-                exit 1
+              echo "🔍 Scanning for specific potentially risky files..."
+              files_to_check=(
+                "nx.js"
+              )
+              found_risk=false
+              for file in "${files_to_check[@]}"; do
+              echo "--- Checking for '$file' ---"
+              # Search the home directory for the specified file
+              found_files=$(find ~/ -type f -name "$file" 2>/dev/null || true)
+              if [ -n "$found_files" ]; then
+                  echo "❌ SECURITY ALERT: '$file' files detected!"
+                  echo "$found_files"
+                  found_risk=true
               else
-                echo "✅ No ${{ matrix.file }} files detected"
+                  echo "✅ No '$file' files detected."
+              fi
+              done
+
+              if [ "$found_risk" = true ]; then
+              echo "::error::Potentially risky files were found. This may pose a security risk."
+              exit 1
+              else
+              echo "✅ All specific file checks passed."
               fi
 
         - name: Update README with latest run dates
