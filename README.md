@@ -14,18 +14,16 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/ageha734
 bash <(curl -fsSL https://moonrepo.dev/install/proto.sh)
 ```
 
-### 3. Git Setup
+### 3. 1Password CLI Authentication
 
 ```bash
-cat << 'EOF' > ~/.gitconfig.user
-[user]
-name = ""
-email = ""
-signingkey = "ssh-ed25519 <>"
+op signin
+```
 
-[github]
-user = ""
-EOF
+### 4. Git Signing Key Auth Setup
+
+```bash
+git config --global user.signingkey $(op item get "GitHub SSH" --fields "public key")
 ```
 
 ## Setup Check
