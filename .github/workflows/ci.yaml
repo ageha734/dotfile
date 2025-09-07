@@ -2,6 +2,7 @@ name: Dotfile Setup CI
 
 on:
     schedule:
+    # 毎月1日の0時0分(UTC)に実行
     - cron: '0 0 1 * *'
     push:
         branches:
@@ -12,14 +13,55 @@ on:
     workflow_dispatch:
 
 jobs:
+    run-security:
+        runs-on: ubuntu-latest
+
+        steps:
+        - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+
+        - name: Malicious File Extension Check
+          run: |
+              echo "🔍 Checking for potentially malicious file extensions..."
+              malicious_extensions=(
+                "*.exe" "*.bat" "*.cmd" "*.com" "*.pif" "*.scr"
+                "*.vbs" "*.vbe" "*.js" "*.jse" "*.wsf" "*.wsh"
+                "*.msi" "*.dll" "*.scf" "*.lnk" "*.inf"
+              )
+
+              found_malicious=false
+              for ext in "${malicious_extensions[@]}"; do
+                files=$(find . -name "$ext" -not -path "./.git/*" || true)
+                if [ -n "$files" ]; then
+                  echo "❌ SECURITY ALERT: Potentially malicious files found!"
+                  echo "Extension: $ext"
+                  echo "$files"
+                  found_malicious=true
+                fi
+              done
+
+              if [ "$found_malicious" = false ]; then
+                echo "✅ No malicious file extensions detected"
+              else
+                echo "::error::Potentially malicious files detected."
+                exit 1
+              fi
+
     run-test:
+        needs: run-security
         runs-on: macos-latest
 
         permissions:
             contents: write
 
+        strategy:
+            matrix:
+                file:
+                - 'nx.js'
+
         steps:
         - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+          with:
+              fetch-depth: 0
 
         - name: Install and initialize chezmoi
           run: |
@@ -34,17 +76,47 @@ jobs:
               rm -f .prototools
               cp dot_local/share/proto/dot_prototools .prototools
 
-        - name: Install tools
+        - name: Install tools via proto
           run: |
               proto install
 
-        - name: Update README with latest successful run date
-          if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        - name: Secret Scan with TruffleHog
+          uses: trufflesecurity/trufflehog@0024b6ce7756f3255c50fd3b1c04d0b446e088a9 # v3.77.0
+          with:
+              path: ~/
+              base: ${{ github.base_ref || 'master' }}
+              head: HEAD
+              extra_args: --debug --only-verified
+
+        - name: Check for ${{ matrix.file }} files (Security Risk)
+          shell: bash
           run: |
+              echo "🔍 Scanning for ${{ matrix.file }} files..."
+              files=$(find ~/ -type f -name '${{ matrix.file }}' 2>/dev/null || true)
+              if [ -n "$files" ]; then
+                echo "❌ SECURITY ALERT: ${{ matrix.file }} files detected!"
+                echo "$files"
+                echo "::error::${{ matrix.file }} files found in repository. This may pose a security risk."
+                exit 1
+              else
+                echo "✅ No ${{ matrix.file }} files detected"
+              fi
+
+        - name: Update README with latest run dates
+          if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+          shell: bash
+          run: |
+              set +H
               current_date=$(date -u +'%Y年%m月%d日')
-              sed -i'.bak' "//a ✅ **${current_date}** に動作確認済み" README.md
+
+              # 新しい確認日をマーカーの「前」に挿入し、ログとして追記します
+              sed -i'.bak' "/<!-- last-check -->/i\\
+              ✅ **${current_date}** に動作確認済み\\
+              🔒 **${current_date}** にセキュリティ確認済み\\
+              " README.md
+
               git config user.name "github-actions[bot]"
               git config user.email "github-actions[bot]@users.noreply.github.com"
               git add README.md
-              git commit -m "docs: 最終動作確認日を更新" || echo "No changes to commit"
+              git commit -m "docs: 最終動作確認日とセキュリティ確認日を更新"
               git push

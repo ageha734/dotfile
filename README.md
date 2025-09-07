@@ -29,5 +29,6 @@ git config --global user.signingkey $(op item get "GitHub SSH" --fields "public 
 ## Setup Check
 
 ✅ **2025年08月01日** に動作確認済み
+🔒 **2025年08月01日** にセキュリティ確認済み
 
-## Security Check
+<!-- last-check -->
