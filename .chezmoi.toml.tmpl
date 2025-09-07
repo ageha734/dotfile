@@ -15,7 +15,7 @@
 {{- else if env "CHEZMOI_ESPANSO" -}}
 {{-   $espanso = eq (env "CHEZMOI_ESPANSO") "true" -}}
 {{- else if env "CI" -}}
-{{-   $espanso = false -}}
+{{-   $espanso = true -}}
 {{- else -}}
 {{-   $espanso = promptBool "espanso" -}}
 {{- end -}}
@@ -26,7 +26,7 @@
 {{- else if env "CHEZMOI_WORK" -}}
 {{-   $work = eq (env "CHEZMOI_WORK") "true" -}}
 {{- else if env "CI" -}}
-{{-   $work = false -}}
+{{-   $work = true -}}
 {{- else -}}
 {{-   $work = promptBool "work" -}}
 {{- end -}}
