@@ -112,6 +112,7 @@ tasks:
     git:rm:his:
         desc: Remove history of a commit
         cmds:
+        - git log --all --name-status --pretty=short --graph -- {{.CLI_ARGS}} HEAD
         - git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch {{.CLI_ARGS}}' -- --all
 
     clean:
