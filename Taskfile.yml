@@ -111,11 +111,14 @@ tasks:
 
     git:rm:his:
         silent: true
-        desc: ⚠️ (DESTRUCTIVE) Remove a file from all history using git-filter-repo.
+        desc: ⚠️ (DESTRUCTIVE) Remove a file from all history with pre/post verification.
         summary: |
             This is a destructive operation that rewrites the entire repository history.
             It requires 'git-filter-repo' to be installed (`pip install git-filter-repo`).
-            All collaborators must be notified and will need to re-clone or reset their local repositories.
+            1. Pre-check: Aborts if the file is not found in git history.
+            2. Rewrite: Removes the file from all commits using git-filter-repo.
+            3. Post-check: Verifies the file has been removed from history and the current HEAD.
+            4. Force Push: Pushes the rewritten history to the remote.
 
             Usage: task git:rm:his -- path/to/your/secret.file
         vars:
@@ -125,14 +128,32 @@ tasks:
           msg: "git-filter-repo is not installed. Please run 'pip install git-filter-repo'."
         - sh: test -n "{{.FILE_PATH}}"
           msg: 'You must provide the path to the file you want to remove. Usage: task git:rm:his -- path/to/file'
+        # - sh: '[ $(git rev-list --all --count -- "{{.FILE_PATH}}") -gt 0 ]'
+        #   msg: "✅ SKIPPED: File '{{.FILE_PATH}}' was not found in the entire Git history. Nothing to do."
         cmds:
         - |
               echo "🔥 Starting the process to remove '{{.FILE_PATH}}' from all of history..."
-              echo "⚠️ This will rewrite your entire git history. Make sure you have a backup if needed."
+              echo "⚠️ THIS IS A DESTRUCTIVE OPERATION. The --force flag is used to run on a non-fresh clone."
         - git-filter-repo --invert-paths --path '{{.FILE_PATH}}' --force
         - |
               echo "✅ History rewriting complete."
-              echo "🚀 Force-pushing the new history to all branches and tags on 'origin'..."
+              echo "🔍 Verifying removal..."
+        - |
+              if [ $(git rev-list --all --count -- "{{.FILE_PATH}}") -eq 0 ]; then
+                echo "  -> ✅ VERIFIED: '{{.FILE_PATH}}' no longer exists in any commit history."
+              else
+                echo "  -> ❌ FAILED: '{{.FILE_PATH}}' was found in the commit history after removal."
+                exit 1
+              fi
+        - |
+              if ! git cat-file -e HEAD:'{{.FILE_PATH}}' 2>/dev/null; then
+                echo "  -> ✅ VERIFIED: '{{.FILE_PATH}}' does not exist in the current HEAD."
+              else
+                echo "  -> ❌ FAILED: '{{.FILE_PATH}}' still exists in the current HEAD."
+                exit 1
+              fi
+        - |
+              echo "🚀 Verification successful. Force-pushing the new history to 'origin'..."
         - git push origin --force --all
         - git push origin --force --tags
         - |
