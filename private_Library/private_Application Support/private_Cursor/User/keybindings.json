@@ -6,5 +6,22 @@
     {
         "key": "cmd+e",
         "command": "composerMode.background"
+    },
+    {
+        "key": "shift+alt+cmd+c",
+        "command": "copyRelativeFilePath"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.terminal.clear",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "shift+enter",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\\\r\n"
+        },
+        "when": "terminalFocus"
     }
 ]

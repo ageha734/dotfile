@@ -2,6 +2,13 @@
 .config/tmux/*
 !.config/tmux/tmux.conf
 
+# nvim
+.config/nvim/lazy-lock.json
+
+# karabiner
+.config/karabiner/*
+!.config/karabiner/karabiner.json
+
 # gh
 .config/gh/*
 !.config/gh/config.yml

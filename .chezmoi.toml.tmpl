@@ -9,17 +9,6 @@
 {{-   $email = promptString "email" -}}
 {{- end -}}
 
-{{- $espanso := false -}}
-{{- if hasKey . "espanso" -}}
-{{-   $espanso = .espanso -}}
-{{- else if env "CHEZMOI_ESPANSO" -}}
-{{-   $espanso = eq (env "CHEZMOI_ESPANSO") "true" -}}
-{{- else if env "CI" -}}
-{{-   $espanso = true -}}
-{{- else -}}
-{{-   $espanso = promptBool "espanso" -}}
-{{- end -}}
-
 {{- $work := false -}}
 {{- if hasKey . "work" -}}
 {{-   $work = .work -}}
@@ -33,5 +22,4 @@
 
 [data]
     email = {{ $email | quote }}
-    espanso = {{ $espanso }}
     work = {{ $work }}
