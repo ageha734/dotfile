@@ -110,10 +110,20 @@ tasks:
         - git log --graph --oneline --all --decorate --date=short --abbrev-commit --pretty=format:'%Cblue%ad %C(auto)%h%Creset -%C(auto)%d%Creset %s %Cblue[%aN]%Creset %Cblue%G?%Creset'
 
     git:rm:his:
-        desc: Remove history of a commit
+        desc: Remove history of a file from git repository completely
         cmds:
+        - git status
+        - git stash push -m "Temporary stash before removing {{.CLI_ARGS}} from history"
         - git log --all --name-status --pretty=short --graph -- {{.CLI_ARGS}} HEAD
-        - git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch {{.CLI_ARGS}}' -- --all
+        - FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch {{.CLI_ARGS}}' -- --all
+        - git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d
+        - git reflog expire --expire=now --all && git gc --prune=now --aggressive
+        - git stash pop || echo "No stash to restore"
+        - git show HEAD:{{.CLI_ARGS}} 2>/dev/null && echo "❌ File still exists in current commit" || echo "✅ File successfully removed from current commit"
+        - git log --oneline --all -- {{.CLI_ARGS}} | head -5 || echo "✅ No commit history found for {{.CLI_ARGS}}"
+        - git fetch origin
+        - git push --force origin --all
+        - git push --force origin --tags
 
     clean:
         desc: Clean up temporary files
