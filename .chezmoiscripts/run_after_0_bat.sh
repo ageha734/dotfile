@@ -1,3 +1,3 @@
-#!/opt/homebrew/bin/fish
+#!/usr/bin/env fish
 
 bat cache --build
