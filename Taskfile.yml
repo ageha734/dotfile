@@ -110,20 +110,37 @@ tasks:
         - git log --graph --oneline --all --decorate --date=short --abbrev-commit --pretty=format:'%Cblue%ad %C(auto)%h%Creset -%C(auto)%d%Creset %s %Cblue[%aN]%Creset %Cblue%G?%Creset'
 
     git:rm:his:
-        desc: Remove history of a file from git repository completely
+        silent: true
+        desc: ⚠️ (DESTRUCTIVE) Remove a file from all history using git-filter-repo.
+        summary: |
+            This is a destructive operation that rewrites the entire repository history.
+            It requires 'git-filter-repo' to be installed (`pip install git-filter-repo`).
+            All collaborators must be notified and will need to re-clone or reset their local repositories.
+
+            Usage: task git:rm:his -- path/to/your/secret.file
+        vars:
+            FILE_PATH: '{{.CLI_ARGS}}'
+        preconditions:
+        - sh: command -v git-filter-repo
+          msg: "git-filter-repo is not installed. Please run 'pip install git-filter-repo'."
+        - sh: test -n "{{.FILE_PATH}}"
+          msg: 'You must provide the path to the file you want to remove. Usage: task git:rm:his -- path/to/file'
         cmds:
-        - git status
-        - git stash push -m "Temporary stash before removing {{.CLI_ARGS}} from history"
-        - git log --all --name-status --pretty=short --graph -- {{.CLI_ARGS}} HEAD
-        - FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch {{.CLI_ARGS}}' -- --all
-        - git for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git update-ref -d
-        - git reflog expire --expire=now --all && git gc --prune=now --aggressive
-        - git stash pop || echo "No stash to restore"
-        - git show HEAD:{{.CLI_ARGS}} 2>/dev/null && echo "❌ File still exists in current commit" || echo "✅ File successfully removed from current commit"
-        - git log --oneline --all -- {{.CLI_ARGS}} | head -5 || echo "✅ No commit history found for {{.CLI_ARGS}}"
-        - git fetch origin
-        - git push --force origin --all
-        - git push --force origin --tags
+        - |
+              echo "🔥 Starting the process to remove '{{.FILE_PATH}}' from all of history..."
+              echo "⚠️ This will rewrite your entire git history. Make sure you have a backup if needed."
+        - git-filter-repo --invert-paths --path '{{.FILE_PATH}}' --force
+        - |
+              echo "✅ History rewriting complete."
+              echo "🚀 Force-pushing the new history to all branches and tags on 'origin'..."
+        - git push origin --force --all
+        - git push origin --force --tags
+        - |
+              echo "🎉 Successfully pushed rewritten history to the remote repository."
+              echo "🔴 IMPORTANT NEXT STEPS:"
+              echo "1. Invalidate the leaked secret immediately."
+              echo "2. Notify all collaborators about this history change."
+              echo "3. Close the 'Secret scanning alert' on GitHub."
 
     clean:
         desc: Clean up temporary files
