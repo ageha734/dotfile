@@ -8,3 +8,7 @@ matches:
     type: date
     params:
         format: '%H:%M'
+  - name: mydate
+    type: date
+    params:
+        format: '%Y-%m-%d'

@@ -21,6 +21,3 @@ config
 dprint.json
 lefthook.yml
 README.md
-{{- if not .espanso }}
-Library/Preferences/espanso
-{{- end }}
